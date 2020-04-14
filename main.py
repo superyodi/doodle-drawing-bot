@@ -1,3 +1,6 @@
+
+# -*- coding: utf-8 -*-≤
+
 import cv2
 import numpy as np
 
@@ -50,7 +53,7 @@ for out in outs:
             class_ids.append(class_id)
 
 # confidence가 더 높은 boxes
-indexes = cv2.dnn.NMSBoxes(boxes, confidences, 0.5, 0.4)
+indexes = cv2.dnn.NMSBoxes(boxes, confidences, 0.6, 0.4)
 
 font = cv2.FONT_HERSHEY_PLAIN
 for i in range(len(boxes)):
