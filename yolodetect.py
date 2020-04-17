@@ -68,6 +68,7 @@ for i in range(len(boxes)):
 
 
 cv2.imshow("Image", img)
+cv2.imwrite("result.png", img)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 
