@@ -7,7 +7,7 @@ qd = QuickDrawData()
 ant = qd.get_drawing("ant")
 
 
-ant.image.show("ant.png")
+ant.image.save("ant.png")
 
 sys.stdout = open("C:\\Users\\MR Lab\\Documents\\drawing-doodle-bot\\output.txt",'w')
 for stroke in ant.strokes:
