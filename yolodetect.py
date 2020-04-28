@@ -11,17 +11,17 @@ classes = []
 with open("coco.names", "r") as f:
     classes = [line.strip() for line in f.readlines()]
 
+
 layer_names = net.getLayerNames()
 output_layers = [layer_names[i[0] - 1] for i in net.getUnconnectedOutLayers()]
-# colors = np.random.uniform(0, 255, size=(len(classes), 3))
 
 # Load img
-img = cv2.imread("test.jpeg")
+img = cv2.imread("sample_images/fire hydrant.jpg")
 img = cv2.resize(img, None, fx = 0.8, fy = 0.8)
 height, width, channels = img.shape
 
 # Detect objects
-blob = cv2.dnn.blobFromImage(img, 0.00392, (416, 416), (0, 0, 0), True, crop=False)
+blob = cv2.dnn.blobFromImage(img, 0.004, (416, 416), (0, 0, 0), True, crop=False)
 net.setInput(blob)
 outs = net.forward(output_layers)
 
@@ -29,6 +29,7 @@ outs = net.forward(output_layers)
 class_ids = []
 confidences = []
 boxes = []
+tmp_confidence = 0
 
 for out in outs:
     for detection in out:
@@ -61,16 +62,12 @@ for i in range(len(boxes)):
         x, y, w, h = boxes[i]
         label = classes[class_ids[i]]
         print(label)
-        cv2.rectangle(img, (x,y), (x + w, y + h), (0, 255, 0), 2)
+        cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
         cv2.putText(img, label, (x, y + 30), font, 1, (255, 255, 255), 1)
 
-
-
-
-cv2.imshow("Image", img)
-cv2.imwrite("result.png", img)
+cv2.imshow("Result", img)
 cv2.waitKey(0)
-cv2.destroyAllWindows()
+# cv2.destroyAllWindows()
 
 
 
