@@ -15,10 +15,11 @@ rHead = pos[3]
 
 moveStroke = 2
 
+dType.SetPTPCmd(api, 2, x, y, z + moveZ, rHead, 1)
+
 f = open("C:\\Users\\MR Lab\\Documents\\drawing-doodle-bot\\output.txt", 'r')
 while True:
     line = f.readline()
-
 
     if (line == '\n'):
         print("z가 움직일 차례")
@@ -35,8 +36,7 @@ while True:
 
         tmpX = int(array[0])
         tmpY = int(array[1])
-        if(moveStroke == 1):
-            dType.SetPTPCmd(api, 2, tmpX, tmpY, z - moveZ, rHead, 1)
+
         dType.SetPTPCmd(api, 2, tmpX, tmpY, z, rHead, 1)
         print(moveStroke)
         moveStroke += 1
