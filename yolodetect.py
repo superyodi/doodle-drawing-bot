@@ -11,13 +11,13 @@ classes = []
 with open("coco.names", "r") as f:
     classes = [line.strip() for line in f.readlines()]
 
-
 layer_names = net.getLayerNames()
 output_layers = [layer_names[i[0] - 1] for i in net.getUnconnectedOutLayers()]
 
 # Load img
-img = cv2.imread("sample_images/fire hydrant.jpg")
-img = cv2.resize(img, None, fx = 0.8, fy = 0.8)
+img = cv2.imread("sample_images/sheep.jpg")
+
+img = cv2.resize(img, None, fx = 0.4, fy = 0.4)
 height, width, channels = img.shape
 
 # Detect objects
@@ -38,7 +38,7 @@ for out in outs:
         class_id = np.argmax(scores)
         #scores를 최댓값으로 만들기 위한
         confidence = scores[class_id]
-        if confidence > 0.2:
+        if confidence > 0.5:
             # 객체 인식
             center_x = int(detection[0] * width)
             center_y = int(detection[1] * height)
@@ -67,7 +67,7 @@ for i in range(len(boxes)):
 
 cv2.imshow("Result", img)
 cv2.waitKey(0)
-# cv2.destroyAllWindows()
+cv2.destroyAllWindows()
 
 
 
