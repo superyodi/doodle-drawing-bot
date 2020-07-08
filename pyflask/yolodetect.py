@@ -67,7 +67,7 @@ def extract_label(img_path):
             cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
             cv2.putText(img, label, (x, y + 30), font, 1, (255, 255, 255), 1)
 
-    return label
+    return classes[class_ids[0]] if len(class_ids) > 0 else ''
 
 
 
