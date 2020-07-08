@@ -11,14 +11,19 @@ classes = []
 with open("coco.names", "r") as f:
     classes = [line.strip() for line in f.readlines()]
 
-
 layer_names = net.getLayerNames()
 output_layers = [layer_names[i[0] - 1] for i in net.getUnconnectedOutLayers()]
 
 # Load img
-img = cv2.imread("sample_images/fire hydrant.jpg")
+img = cv2.imread("sample_images/car.jpg")
+
 img = cv2.resize(img, None, fx = 0.8, fy = 0.8)
 height, width, channels = img.shape
+
+cv2.imshow("Input", img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
 
 # Detect objects
 blob = cv2.dnn.blobFromImage(img, 0.004, (416, 416), (0, 0, 0), True, crop=False)
@@ -38,7 +43,7 @@ for out in outs:
         class_id = np.argmax(scores)
         #scores를 최댓값으로 만들기 위한
         confidence = scores[class_id]
-        if confidence > 0.2:
+        if confidence > 0.5:
             # 객체 인식
             center_x = int(detection[0] * width)
             center_y = int(detection[1] * height)
@@ -65,8 +70,8 @@ for i in range(len(boxes)):
         cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
         cv2.putText(img, label, (x, y + 30), font, 1, (255, 255, 255), 1)
 
-cv2.imshow("Result", img)
-cv2.waitKey(0)
+# cv2.imshow("Result", img)
+# cv2.waitKey(0)
 # cv2.destroyAllWindows()
 
 
