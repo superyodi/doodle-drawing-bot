@@ -4,6 +4,9 @@
 import cv2
 import numpy as np
 
+
+label = ""
+
 def extract_label(img_path):
 
     # Load Yolo
@@ -68,6 +71,8 @@ def extract_label(img_path):
             cv2.putText(img, label, (x, y + 30), font, 1, (255, 255, 255), 1)
 
     return classes[class_ids[0]] if len(class_ids) > 0 else ''
+
+
 
 
 
