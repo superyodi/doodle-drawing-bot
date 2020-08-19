@@ -24,8 +24,12 @@ if not os.path.exists(TEMP_DIR):
     os.mkdir(TEMP_DIR)
 
 app = Flask(__name__)
+# run_with_ngrok(app)
 app.debug = True
 app.config['UPLOAD_FOLDER'] = UPLOAD_DIR
+
+# if __name__ == '__main__':
+#     app.run()
 
 
 # 확장자 check
@@ -96,6 +100,7 @@ def draw_doodle():
         return jsonify({'success': False})
 
     make_coord(doodle)
+    print("dobot_coord.txt 업로드 완료")
     return jsonify({'success': True})
 
 
