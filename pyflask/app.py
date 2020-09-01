@@ -70,7 +70,7 @@ def inspect():
 
             doodle.setImgPath(img_path)
 
-            filename = 'detected_{}'.format(filename)
+            filename = 'DETECTED_{}'.format(filename)
             new_img_path = os.path.join(DETECTED_DIR, filename)
             cv2.imwrite(new_img_path, doodle.make_detectedImg())
 
@@ -97,34 +97,32 @@ def find_doodle():
     return send_from_directory(TEMP_DIR, filename)
 
 # 사진 받아서 낙서이미지 전송
-@app.route('/doodles/', methods=['POST'])
+@app.route('/doodles/', methods=['GET'])
 def draw_doodles():
+    imgPath = request.args.get('imgPath')
+    print(imgPath)
 
-    if 'file' not in request.files:
-        return jsonify({'error': 'no file'}), 400
-    file = request.files['file']
 
-    if file.filename == '':
-        return jsonify({'error': 'no file'}), 400
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        img_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(img_path)
+    # image path에 해당하는 이미지를 찾는다.
+    try:
+        doodle.setImgPath('./upload/{}'.format(imgPath))
+        doodle.d_strokes = None
 
-        # doodle.setImgPath(img_path)
+    except:
+        return jsonify({'error': 'Wrong file path'}), 400
 
-        filename = 'doodled_{}'.format(filename)
-        new_img_path = os.path.join(TEMP_DIR, filename)
-        cv2.imwrite(new_img_path, doodle.make_doodleImg())
+    filename = 'DOODLED_{}'.format(imgPath)
+    new_img_path = os.path.join(TEMP_DIR, filename)
+    cv2.imwrite(new_img_path, doodle.make_doodleImg())
 
-        return send_from_directory(TEMP_DIR, filename)
+    return send_from_directory(TEMP_DIR, filename)
 
 
 # doodleApp에서 낙서선택 버튼을 누르면 해당 낙서의 좌표값으 txt에 저장
 @app.route('/draw/')
 def draw_doodle():
     try:
-        doodle.make_dobotCoord("./tmp_dobot_coord.txt")
+        doodle.make_dobotCoord("./dobot_coord.txt")
         print("dobot_coord.txt 업로드 완료")
         return jsonify({'success': True})
     except:

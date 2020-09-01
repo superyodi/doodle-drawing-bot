@@ -16,9 +16,13 @@ class DrawDoodle:
         self.width = None
         self.channels = None
         self.d_strokes = None
+        self.random_Key = None
 
     def setImgPath(self, img_path):
         img = cv2.imread(img_path)
+        img = cv2.resize(img, None, fx=0.8, fy=0.8)
+
+        print(img_path)
 
         self.img_path = img_path
         self.img = img
@@ -27,15 +31,15 @@ class DrawDoodle:
         self.width = width
         self.channels = channels
 
-
-
     def make_dobotCoord(self, output_file):
-
+        print(self.random_Key)
         with open(output_file, 'w') as f:
             for stroke in self.d_strokes:
                 for x, y in stroke:
                     f.write('%d %d\n' % (x, y))
                 f.write('\n')
+
+        print("그리기 완료")
 
     def draw_chart(self):
         img2 = self.make_doodleImg()
@@ -62,13 +66,10 @@ class DrawDoodle:
 
         self.detect_obect(img_doodle, 1)
 
-        # '{}/{}'.format(read_dir, file)
-        cv2.imwrite('{}_{}.png'.format("doodle", "00"), img_doodle)
         return img_doodle
 
     def make_detectedImg(self):
         self.detect_obect(self.img, 0)
-        cv2.imwrite('{}_{}.png'.format("detected", "00"), self.img)
 
         return self.img
 
@@ -83,6 +84,7 @@ class DrawDoodle:
     def draw_doodle(self, img, label, d_w0, d_h0, d_w, d_h):
 
         idx = random.randrange(0, 999)
+        self.random_Key = idx
         doodle = QuickDrawData().get_drawing(label, idx)
 
         # 낙서 그릴때 dobot_coord.txt도 동시에 만든다.
@@ -99,7 +101,7 @@ class DrawDoodle:
                 pre_x = int(d_w * stroke[i+1][0]/ 255) + d_w0
                 pre_y = int(d_h * stroke[i+1][1] / 255) + d_h0
 
-                cv2.line(img, (pre_x, pre_y), (x, y), (255, 0, 0), 2)
+                cv2.line(img, (pre_x, pre_y), (x, y), (0, 0, 0), 10)
 
                 d_x = int((x / self.width * 255) / 2 + 180)
                 d_y = int((y / self.height * 255) / 2 - 80)
@@ -168,7 +170,7 @@ class DrawDoodle:
                     class_ids.append(class_id)
 
         # confidence가 더 높은 boxes
-        indexes = cv2.dnn.NMSBoxes(boxes, confidences, 0.3, 0.6)
+        indexes = cv2.dnn.NMSBoxes(boxes, confidences, 0.5, 0.4)
 
         # show detected iamge
         # with open(self.OUTPUT_FILE, 'w') as f:
@@ -187,10 +189,10 @@ class DrawDoodle:
                         else:
                             print("해당하는 낙서가 없습니다.")
                 else:
-                    cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                    cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 10)
 
                     font = cv2.FONT_HERSHEY_PLAIN
-                    cv2.putText(img, label, (x, y + 30), font, 1, (255, 255, 255), 1)
+                    cv2.putText(img, label, (x, y + 30), font, 10, (255, 255, 255), 10)
 
 
 
