@@ -58,5 +58,5 @@ while True:
         print(x, y, z)
         moveStroke += 1
 
-
+dType.SetPTPCmd(api, 2, x, y, z, rHead, 1)
 f.close()
