@@ -5,6 +5,9 @@ from flask import Flask, flash, request, redirect, url_for, jsonify, send_from_d
 from werkzeug.utils import secure_filename
 from yolo_draw import DrawDoodle
 from quickdraw import QuickDrawData
+import cv2
+
+# from flask_ngrok import run_with_ngrok
 
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
@@ -16,8 +19,8 @@ UPLOAD_DIR = os.path.join(CURR_DIR, 'upload')
 TEMP_DIR = os.path.join(CURR_DIR, 'temp')
 # 객체 검출한 결과 이미지 저장 디렉터리
 DETECTED_DIR = os.path.join(CURR_DIR, 'detected')
-# 연구실 com path: open("C:\\Users\\MR Lab\\Documents\\drawing-doodle-bot\\output.txt",'w')
-OUTPUT_FILE = "/Users/superyodi/Documents/develop/doodle-bot/doodle-drawing-bot/pyflask/dobot_coord.txt"
+
+OUTPUT_FILE = "/Users/superyodi/Documents/develop/doodle-bot/doodle-drawing-bot"
 
 if not os.path.exists(UPLOAD_DIR):
     os.mkdir(UPLOAD_DIR)
@@ -50,19 +53,24 @@ def allowed_file(filename):
 def index():
     return 'Welcome to Doodle-Bot Server ;-)'
 
+# test server
+@app.route('/test/')
+def test():
+    return jsonify({'success': True})
 
+# 이미지 받아서, 객체 검출된 이미지 전송
 @app.route('/inspect/', methods=['GET', 'POST'])
 def inspect():
     if request.method == 'POST':
         # check if the post request has the file part
         if 'file' not in request.files:
-            return jsonify({'error': 'no file'})
+            return jsonify({'error': 'no file'}), 400
         file = request.files['file']
 
         # if user does not select file, browser also
         # submit an empty part without filename
         if file.filename == '':
-            return jsonify({'error': 'no file'})
+            return jsonify({'error': 'no file'}), 400
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             img_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
@@ -88,11 +96,12 @@ def find_doodle():
     try:
         doodle = QuickDrawData().get_drawing(label, int(index))
     except:
-        return jsonify({'success': False})
+        return jsonify({'success': False}), 422
 
     print(TEMP_DIR)
     filename = '%s_%s.png' % (label, index,)
-    doodle.image.save(os.path.join(TEMP_DIR, filename))
+
+    doodle.image.resize((512, 512), ).save(os.path.join(TEMP_DIR, filename))
 
     return send_from_directory(TEMP_DIR, filename)
 
@@ -118,15 +127,6 @@ def draw_doodles():
     return send_from_directory(TEMP_DIR, filename)
 
 
-# doodleApp에서 낙서선택 버튼을 누르면 해당 낙서의 좌표값으 txt에 저장
-@app.route('/draw/')
-def draw_doodle():
-    try:
-        doodle.make_dobotCoord("./dobot_coord.txt")
-        print("dobot_coord.txt 업로드 완료")
-        return jsonify({'success': True})
-    except:
-        return jsonify({'sucess': False})
 
 
 

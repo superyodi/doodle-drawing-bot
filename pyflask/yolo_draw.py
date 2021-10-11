@@ -3,7 +3,6 @@ import random
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.image import imread
 from quickdraw import QuickDrawData
 
 
@@ -18,8 +17,11 @@ class DrawDoodle:
         self.d_strokes = None
         self.random_Key = None
 
+
+    # 앱에서 보내온 원본사진을 img에 저장
     def setImgPath(self, img_path):
         img = cv2.imread(img_path)
+        img = cv2.flip(img_path, 1)
         img = cv2.resize(img, None, fx=0.8, fy=0.8)
 
         print(img_path)
@@ -31,6 +33,7 @@ class DrawDoodle:
         self.width = width
         self.channels = channels
 
+    # dobot 가동범위에 맞게 mapping 후 txt파일로 저장
     def make_dobotCoord(self, output_file):
         print(self.random_Key)
         with open(output_file, 'w') as f:
@@ -41,6 +44,7 @@ class DrawDoodle:
 
         print("그리기 완료")
 
+    # doodle image와 yolo detected image 같이 보여줌
     def draw_chart(self):
         img2 = self.make_doodleImg()
         img1 = self.make_detectedImg()
@@ -61,6 +65,7 @@ class DrawDoodle:
 
         plt.show()
 
+    # doodle image 생성
     def make_doodleImg(self):
         img_doodle = np.full((self.height, self.width, 3), 255, dtype=np.uint8)
 
@@ -68,12 +73,15 @@ class DrawDoodle:
 
         return img_doodle
 
+    # yolo detected image 생성
     def make_detectedImg(self):
         self.detect_obect(self.img, 0)
 
         return self.img
 
+    # 사람 낙서이미지 만들기 (얼굴 + 상의 + 하의)
     def draw_person(self, img, d_w0, d_h0, d_w, d_h):
+        # 얼굴
         self.draw_doodle(img, "face", d_w0, d_h0, d_w, d_h // 3)
         # 상의
         self.draw_doodle(img, "t-shirt", d_w0, d_h0+d_h//3, d_w, d_h//3)
@@ -120,6 +128,7 @@ class DrawDoodle:
             self.d_strokes.append(d_points)
 
     # flag: 0 -> make detected img, flag: 1 -> make doodle img
+    # 객체 검출
     def detect_obect(self, out_img, flag):
 
         # Load Yolo
@@ -170,7 +179,7 @@ class DrawDoodle:
                     class_ids.append(class_id)
 
         # confidence가 더 높은 boxes
-        indexes = cv2.dnn.NMSBoxes(boxes, confidences, 0.5, 0.4)
+        indexes = cv2.dnn.NMSBoxes(boxes, confidences, 0.2, 0.2)
 
         # show detected iamge
         # with open(self.OUTPUT_FILE, 'w') as f:
@@ -186,34 +195,16 @@ class DrawDoodle:
                     except:
                         if label == "person":
                             self.draw_person(out_img, x, y, w, h)
+                        if label == "teddy bear":
+                            self.draw_doodle(out_img, "bear", x, y, w, h)
                         else:
+                            print(label)
                             print("해당하는 낙서가 없습니다.")
                 else:
                     cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 10)
 
                     font = cv2.FONT_HERSHEY_PLAIN
-                    cv2.putText(img, label, (x, y + 30), font, 10, (255, 255, 255), 10)
+                    cv2.putText(img, label, (x, y + 30), font, 5, (255, 255, 255), 5)
 
 
 
-# confidence 값에 대한 bounding box 결과 확인하기
-# def trackbar2(x):
-#     confidence = x/100
-#     r = r0.copy()
-#     for output in np.vstack(outs):
-#         if output[4] > confidence:
-#             x, y, w, h = output[:4]
-#             print(x, y, w, h)
-#             p0 = int((x-w/2)*416), int((y-h/2)*416)
-#             p1 = int((x+w/2)*416), int((y+h/2)*416)
-#             cv2.rectangle(r, p0, p1, 1, 1)
-#     cv2.imshow('blob', r)
-#     text = f'Bbox confidence={confidence}'
-#     cv2.displayOverlay('blob', text)
-#
-# r0 = blob[0, 0, :, :]
-# r = r0.copy()
-# cv2.imshow('blob', r)
-# cv2.createTrackbar('confidence', 'blob', 50, 101, trackbar2)
-# trackbar2(50)
-# cv2.waitKey(0)
