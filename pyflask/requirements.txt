@@ -17,7 +17,7 @@ Jinja2==2.11.3
 kiwisolver==1.2.0
 MarkupSafe==1.1.1
 matplotlib==3.2.1
-numpy==1.18.2
+numpy==1.22.0
 opencv-python==4.2.0.34
 pi==0.1.2
 Pillow==9.0.1
